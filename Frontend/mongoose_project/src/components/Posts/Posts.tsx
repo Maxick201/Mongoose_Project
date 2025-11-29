@@ -10,7 +10,7 @@ function Posts({posts}:PostsType){
     return (
         <>
         <div>
-            {posts.map((p)=> <Post {...p} key={p.Id}/>)}
+            {posts.map((p)=> <Post {...p} key={p.id}/>)}
         </div>
         </>
     )

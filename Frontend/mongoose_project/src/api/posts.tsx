@@ -5,6 +5,12 @@
 import axios from "axios";
 
 //ИЗУЧИТЬ
-export async function getPosts(){
-    return await axios.get('https://jsonplaceholder.typicode.com/posts');
+export async function getPosts(page ?: number, limit ?: number){
+    return await axios.get('https://jsonplaceholder.typicode.com/posts',{ 
+        params: {
+            _page : page,
+            _limit : limit
+        }
+    });
+
 }

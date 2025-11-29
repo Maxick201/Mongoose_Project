@@ -4,7 +4,7 @@ import { getPosts } from "../api/posts";
 import type { PostType } from "../components/Post/Post";
 
 
-export const useFetchPosts = () => {
+export const useFetchPosts = (page ?: number, limit ?: number , save?:boolean) => {
     const [isLoading,setIsLoading] = useState<boolean>(false);
     const [isError,setIsError] = useState<string>("");
     const [data,setData] = useState<PostType[]>([]);
@@ -12,9 +12,14 @@ export const useFetchPosts = () => {
     const fetchPosts = async()=>{
         try {
         setIsLoading(true);
-        const response = await getPosts();
+        const response = await getPosts(page ,limit );
         console.log("response",response); 
+        if(save){
+           setData((prev)=>[...prev,...response.data]);
+        }
+        else {
         setData(response.data);
+        }
         setIsLoading(false);
         setIsError("");
         }
@@ -26,7 +31,7 @@ export const useFetchPosts = () => {
     }
     useEffect(()=>{
   fetchPosts();
- },[]);
+ },[page,save]);
            
     
     return {isLoading,isError,data}
