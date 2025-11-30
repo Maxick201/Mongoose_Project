@@ -22,22 +22,53 @@ function App() {
   const { isLoading, isError, data } = useFetchPosts(page, 10, save);
   const quantity = getPagesQuantity(100, 10);
   
+  const [searchValue, setSearchValue] = useState("");
 
-  const [value, setValue] = useState <string>("");
+  const [searchResults, setSearchResults] = useState([]);
 
-  const sortedTodos = [...data].sort((a, b) => {
-     if(a.hasOwnProperty(value) && b.hasOwnProperty(value)) {
+
+    const [value, setValue] = useState <string>("");
+
+    // const sortedTodos = [...data].sort((a:PostType, b:PostType) => {
+    //    if(a.hasOwnProperty(value) && b.hasOwnProperty(value)) {
+    //       const Avalue = a[value] as unknown;
+    //       const Bvalue = b[value];
+    //        if(typeof Avalue ==="number" && typeof Bvalue === "number"){
+    //           return a[value] - b[value]
+    //        }
+    //    }
+
+
+    // });
+
+  
+
+    const sortedPosts = [...data].sort((a, b) => {
+      if (a.hasOwnProperty(value) && b.hasOwnProperty(value)) {
         const Avalue = a[value];
         const Bvalue = b[value];
-         if(typeof Avalue ==="number" && typeof Bvalue === "number"){
-            a[value] - b[value]
-         }
-     }
+        if (typeof Avalue === "number" && typeof Bvalue === "number") {
+          return a[value] - b[value];
+        } else if (typeof Avalue === "string" && typeof Bvalue === "string") {
+          return a[value].localeCompare(b[value]);
+        }
+      }
+      return 0;
+    });
+  
+    console.log(searchValue , "search value")
+    const search = (t)=>{
+      const foundedPosts = sortedPosts.filter((p)=> p.title === t);
+      console.log(foundedPosts + "Pam pam");
 
-     
-  });
+      if(!foundedPosts.length)
+      {
+        console.log("sfdsdasd");
+        setSearchResults(foundedPosts);
+      }
+      
+    }
 
-  console.log(value);
   return (
     <BrowserRouter>
       <Routes>
@@ -46,7 +77,7 @@ function App() {
           element={
             <>
 
-            
+
               <select value = {value} onChange = {(e)=> setValue(e.target.value)}>
                 <option value="">Выберите выриант</option>
                 <option value="id">По Id</option>
@@ -54,6 +85,12 @@ function App() {
                 <option value="userid">По UserId</option>
               </select>
 
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                search(searchValue);
+              }}>
+                <input onChange = {(e) => {setSearchValue(e.target.value)}} type = "search" placeholder='Title...'/>
+              </form>
               <div style={{ display: "flex" }}>
                 <LeftButton page={page} setPage={setPage} setSave={setSave} />
                 <PaginationButtons
@@ -64,11 +101,24 @@ function App() {
                 />
                 <RightButton page={page} setPage={setPage} setSave={setSave} />
               </div>
+              
 
-              <Slider posts={sortedData} loop />
+              <Slider posts={sortedPosts} loop />
+
+              {/* <StatusWrapper isError={isError} isLoading={isLoading}>
+                {searchResults.length > 0} ? (
+                    <Posts posts={searchResults} />
+                  ) : (
+                    <Posts posts={sortedPosts} />
+                  );
+              </StatusWrapper> */}
 
               <StatusWrapper isError={isError} isLoading={isLoading}>
-                <Posts posts={sortedData} />
+                {searchResults.length > 0 ? (
+                  <Posts posts={searchResults} />
+                ) : (
+                  <Posts posts={sortedPosts} />
+                )}
               </StatusWrapper>
 
               {page < 10 && (
